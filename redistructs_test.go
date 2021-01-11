@@ -11,9 +11,6 @@ import (
 )
 
 func TestPut(t *testing.T) {
-	conn := redisPool.Get()
-	defer conn.Close()
-
 	now := time.Now()
 	postStore := New(redisPool, *types.CreateConfig(), &Post{})
 
@@ -51,6 +48,9 @@ func TestPut(t *testing.T) {
 		panic(err)
 	}
 
+	conn := redisPool.Get()
+	defer conn.Close()
+
 	c, err := redigo.Int(conn.Do("HLEN", "*Post"))
 	if err != nil {
 		panic(err)
@@ -75,9 +75,6 @@ func TestPut(t *testing.T) {
 func TestGet(t *testing.T) {
 	TestPut(t)
 
-	conn := redisPool.Get()
-	defer conn.Close()
-
 	postStore := New(redisPool, *types.CreateConfig(), &Post{})
 
 	p := &Post{ID: 4}
@@ -92,5 +89,40 @@ func TestGet(t *testing.T) {
 
 	if p.Title != "post 4" {
 		panic(fmt.Errorf("expect: %v, got: %v", "post 4", p.Title))
+	}
+}
+
+func TestDelete(t *testing.T) {
+	TestPut(t)
+
+	postStore := New(redisPool, *types.CreateConfig(), &Post{})
+
+	p := &Post{ID: 4}
+	err := postStore.Delete(context.TODO(), p)
+	if err != nil {
+		panic(err)
+	}
+
+	conn := redisPool.Get()
+	defer conn.Close()
+
+	c, err := redigo.Int(conn.Do("HLEN", "*Post"))
+	if err != nil {
+		panic(err)
+	}
+	if c != 3 {
+		panic(fmt.Errorf("expect: %v, got: %v", 3, c))
+	}
+
+	c, err = redigo.Int(conn.Do("ZCARD", "*Post/0"))
+	if err != nil {
+		panic(err)
+	}
+	if c != 2 {
+		panic(fmt.Errorf("expect: %v, got: %v", 2, c))
+	}
+	c, _ = redigo.Int(conn.Do("ZCARD", "*Post/0.EXPIREAT"))
+	if c != 2 {
+		panic(fmt.Errorf("expect: %v, got: %v", 2, c))
 	}
 }

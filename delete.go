@@ -66,15 +66,11 @@ func (rs *RedigoStructs) delete(conn redigo.Conn, src reflect.Value) error {
 		if len(m.Serialized()) == 0 {
 			return errors.Errorf("failed to implement Serialized %v", m)
 		}
-		err = rs.scripts["1_HDELXP"].Send(conn, rs.name, m.PrimaryKey())
+		err = rs.scripts["HDELXP"].Send(conn, rs.name, m.PrimaryKey())
 		if err != nil {
 			return errors.Wrapf(err, "failed to send HDELXP %s", rs.key)
 		}
-		var args []string
-		for k, _ := range m.ScoreMap() {
-			args = append(args, fmt.Sprint(k))
-		}
-		err = rs.scripts["1_ZREM"].Send(conn, rs.key, args)
+		err = rs.scripts["ZREMXP"].Send(conn, rs.key, m.PrimaryKey())
 		if err != nil {
 			conn.Do("DISCARD")
 			return errors.Wrapf(err, "failed to 2_ZADDXP %v", rs.key)
