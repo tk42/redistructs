@@ -2,6 +2,7 @@ package redistructs
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	redigo "github.com/gomodule/redigo/redis"
@@ -28,29 +29,21 @@ type RedigoStructs struct {
 	scripts  map[string]*redigo.Script
 }
 
-func NewRedigoStructs(config types.Config, model types.RediStruct) RediStructs {
+func NewRedigoStructs(pool Pool, config types.Config, model types.RediStruct) RediStructs {
 	redigoStructs := RedigoStructs{
-		config: config,
-		model:  model,
-		dbIdx:  0,
-		name:   types.GetName(model),
-		key:    types.GetName(model) + model.KeyDelimiter() + model.PrimaryKey(),
-		pool: &redigo.Pool{
-			MaxIdle:     config.MaxIdle,
-			MaxActive:   config.MaxActive,
-			Wait:        false, // true: blocking until the number of connections is under MaxActive
-			IdleTimeout: config.IdleTimeout,
-			Dial: func() (redigo.Conn, error) {
-				return redigo.Dial("tcp", config.Address)
-			},
-		},
+		config:  config,
+		model:   model,
+		dbIdx:   0,
+		name:    types.GetName(model),
+		key:     types.GetName(model) + model.KeyDelimiter() + model.PrimaryKey(),
+		pool:    pool,
 		scripts: loadScripts(),
 	}
 	redigoStructs.setExpire(model)
-	return redigoStructs
+	return &redigoStructs
 }
 
-func (rs RedigoStructs) setExpire(model types.RediStruct) {
+func (rs *RedigoStructs) setExpire(model types.RediStruct) {
 	e := model.Expire()
 	switch e.(type) {
 	case time.Time:
@@ -62,11 +55,11 @@ func (rs RedigoStructs) setExpire(model types.RediStruct) {
 	}
 }
 
-func (rs RedigoStructs) getExpire() time.Duration {
+func (rs *RedigoStructs) getExpireArg() string {
 	if rs.expireAt.IsZero() {
-		return rs.expire
+		return fmt.Sprint(float64(rs.expire) / float64(time.Second))
 	} else {
-		return rs.expireAt.Sub(time.Now())
+		return fmt.Sprint(float64(rs.expireAt.Sub(time.Now())) / float64(time.Second))
 	}
 }
 
@@ -84,7 +77,7 @@ func loadScripts() map[string]*redigo.Script {
 	return scripts
 }
 
-func (rs RedigoStructs) getDBIndex(model types.RediStruct) (int, bool) {
+func (rs *RedigoStructs) getDBIndex(model types.RediStruct) (int, bool) {
 	dbIdx := 0
 	if rs.config.DatabaseIdx < 0 && model.DatabaseIdx() < 0 {
 		panic("Invalid database index")

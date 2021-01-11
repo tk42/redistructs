@@ -10,7 +10,7 @@ import (
 	"github.com/tk42/redistructs/types"
 )
 
-func (rs RedigoStructs) Put(ctx context.Context, src interface{}) error {
+func (rs *RedigoStructs) Put(ctx context.Context, src interface{}) error {
 	conn, err := rs.pool.GetContext(ctx)
 	if err != nil {
 		return errors.Wrap(err, "failed to acquire a connection")
@@ -31,7 +31,7 @@ func (rs RedigoStructs) Put(ctx context.Context, src interface{}) error {
 	return err
 }
 
-func (rs RedigoStructs) set(conn redigo.Conn, src reflect.Value) error {
+func (rs *RedigoStructs) set(conn redigo.Conn, src reflect.Value) error {
 	m, ok := src.Interface().(types.RediStruct)
 	if !ok {
 		return fmt.Errorf("failed to cast %v to types.RediStruct", src.Interface())
@@ -66,7 +66,7 @@ func (rs RedigoStructs) set(conn redigo.Conn, src reflect.Value) error {
 		if len(m.Serialized()) == 0 {
 			return errors.Errorf("failed to implement Serialized %v", m)
 		}
-		err = rs.scripts["2_HSETXP"].Send(conn, rs.name, rs.expire, m.PrimaryKey(), m.Serialized())
+		err = rs.scripts["HSETXP"].Send(conn, rs.name, rs.getExpireArg(), m.PrimaryKey(), m.Serialized())
 		if err != nil {
 			return errors.Wrapf(err, "failed to send HSETXP %s", rs.key)
 		}
@@ -74,7 +74,7 @@ func (rs RedigoStructs) set(conn redigo.Conn, src reflect.Value) error {
 		for k, v := range m.ScoreMap() {
 			args = append(args, fmt.Sprint(v), fmt.Sprint(k))
 		}
-		err = rs.scripts["2_ZADDXP"].Send(conn, rs.key, rs.expire, args)
+		err = rs.scripts["ZADDXP"].Send(conn, rs.key, rs.getExpireArg(), args)
 		if err != nil {
 			conn.Do("DISCARD")
 			return errors.Wrapf(err, "failed to 2_ZADDXP %v", rs.key)
@@ -83,12 +83,17 @@ func (rs RedigoStructs) set(conn redigo.Conn, src reflect.Value) error {
 		panic("unsupported store type")
 	}
 
-	r, err := redigo.Values(conn.Do("EXEC"))
+	vals, err := redigo.Values(conn.Do("EXEC"))
 	if err != nil {
 		return errors.Wrap(err, "faild to EXEC commands")
 	}
-	if r[0] != "OK" {
-		return errors.Wrap(err, "return FAILED after EXEC commands")
+	for _, r := range vals {
+		if r.(int64) != 1 {
+			return errors.Wrap(errors.New("return FAILED after EXEC commands"), fmt.Sprint(vals))
+		}
 	}
+	// if vals[0] != "OK" {
+	// 	return
+	// }
 	return nil
 }

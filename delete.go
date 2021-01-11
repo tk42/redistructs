@@ -10,7 +10,7 @@ import (
 	"github.com/tk42/redistructs/types"
 )
 
-func (rs RedigoStructs) Delete(ctx context.Context, src interface{}) error {
+func (rs *RedigoStructs) Delete(ctx context.Context, src interface{}) error {
 	conn, err := rs.pool.GetContext(ctx)
 	if err != nil {
 		return errors.Wrap(err, "failed to acquire a connection")
@@ -31,7 +31,7 @@ func (rs RedigoStructs) Delete(ctx context.Context, src interface{}) error {
 	return err
 }
 
-func (rs RedigoStructs) delete(conn redigo.Conn, src reflect.Value) error {
+func (rs *RedigoStructs) delete(conn redigo.Conn, src reflect.Value) error {
 	m, ok := src.Interface().(types.RediStruct)
 	if !ok {
 		return fmt.Errorf("failed to cast %v to types.RediStruct", src.Interface())

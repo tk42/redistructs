@@ -10,18 +10,13 @@ replace (
 )
 
 require (
-	github.com/fatih/structs v1.1.0
-	github.com/garyburd/redigo v1.6.2
-	github.com/go-errors/errors v1.1.1 // indirect
-	github.com/go-redis/redis/v8 v8.4.4
-	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible
+	github.com/google/go-cmp v0.5.4 // indirect
 	github.com/izumin5210/ro v0.4.0
 	github.com/lib/pq v1.9.0 // indirect
-	github.com/ory-am/common v0.4.0 // indirect
-	github.com/ory/dockertest v3.3.2+incompatible
 	github.com/ory/dockertest/v3 v3.6.3
-	github.com/pborman/uuid v1.2.1 // indirect
 	github.com/pkg/errors v0.9.1
-	github.com/tk42/redis-lua-scripts v0.0.0-20210106105717-72cb85d4286d
+	github.com/stretchr/testify v1.6.1 // indirect
+	github.com/tk42/redis-lua-scripts v0.0.0-20210110151629-279682391ee1
+	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb // indirect
 )

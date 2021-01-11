@@ -9,7 +9,7 @@ import (
 	"github.com/tk42/redistructs/types"
 )
 
-func (rs RedigoStructs) Get(ctx context.Context, dests ...types.RediStruct) error {
+func (rs *RedigoStructs) Get(ctx context.Context, dests ...types.RediStruct) error {
 	conn, err := rs.pool.GetContext(ctx)
 	if err != nil {
 		return errors.Wrap(err, "failed to acquire a connection")

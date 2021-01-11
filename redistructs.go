@@ -23,6 +23,6 @@ type RediStructs interface {
 }
 
 // New creates a RediStructs instance
-func New(config types.Config, model types.RediStruct) RediStructs {
-	return NewRedigoStructs(config, model)
+func New(pool Pool, config types.Config, model types.RediStruct) RediStructs {
+	return NewRedigoStructs(pool, config, model)
 }
