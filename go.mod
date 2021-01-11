@@ -17,6 +17,6 @@ require (
 	github.com/ory/dockertest/v3 v3.6.3
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.6.1 // indirect
-	github.com/tk42/redis-lua-scripts v0.0.0-20210110151629-279682391ee1
+	github.com/tk42/redis-lua-scripts v0.0.0-20210111074637-7798c321f31c
 	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb // indirect
 )

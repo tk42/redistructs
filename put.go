@@ -44,11 +44,11 @@ func (rs *RedigoStructs) set(conn redigo.Conn, src reflect.Value) error {
 
 	_, err := conn.Do("WATCH", rs.name)
 	if err != nil {
-		return errors.Wrapf(err, "failed to send WATCH %ss", rs.name)
+		return errors.Wrapf(err, "failed to send WATCH %s", rs.name)
 	}
 	_, err = conn.Do("WATCH", rs.key)
 	if err != nil {
-		return errors.Wrapf(err, "failed to send WATCH %ss", rs.key)
+		return errors.Wrapf(err, "failed to send WATCH %s", rs.key)
 	}
 
 	err = conn.Send("MULTI")
@@ -70,30 +70,28 @@ func (rs *RedigoStructs) set(conn redigo.Conn, src reflect.Value) error {
 		if err != nil {
 			return errors.Wrapf(err, "failed to send HSETXP %s", rs.key)
 		}
-		var args []string
+		args := []interface{}{rs.key, rs.getExpireArg()}
 		for k, v := range m.ScoreMap() {
 			args = append(args, fmt.Sprint(v), fmt.Sprint(k))
 		}
-		err = rs.scripts["ZADDXP"].Send(conn, rs.key, rs.getExpireArg(), args)
+		err = rs.scripts["ZADDXP"].Send(conn, args...)
 		if err != nil {
 			conn.Do("DISCARD")
-			return errors.Wrapf(err, "failed to 2_ZADDXP %v", rs.key)
+			return errors.Wrapf(err, "failed to ZADDXP %v", rs.key)
 		}
 	default:
 		panic("unsupported store type")
 	}
 
-	vals, err := redigo.Values(conn.Do("EXEC"))
+	vals, err := redigo.Ints(conn.Do("EXEC"))
 	if err != nil {
 		return errors.Wrap(err, "faild to EXEC commands")
 	}
 	for _, r := range vals {
-		if r.(int64) != 1 {
+		// the number of elements added to the sorted set
+		if r == 0 {
 			return errors.Wrap(errors.New("return FAILED after EXEC commands"), fmt.Sprint(vals))
 		}
 	}
-	// if vals[0] != "OK" {
-	// 	return
-	// }
 	return nil
 }

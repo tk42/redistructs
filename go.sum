@@ -86,8 +86,8 @@ github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81P
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/stretchr/testify v1.6.1 h1:hDPOHmpOpP40lSULcqw7IrRb/u7w6RpDC9399XyoNd0=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
-github.com/tk42/redis-lua-scripts v0.0.0-20210110151629-279682391ee1 h1:Ae5gQ8635SoQk6+JXYRPdXrpK/qYwHN8EogepLKFJHo=
-github.com/tk42/redis-lua-scripts v0.0.0-20210110151629-279682391ee1/go.mod h1:LAAXCJmjO3XtNp14G+G8ERKZF69j08MS6vPjx13LS6s=
+github.com/tk42/redis-lua-scripts v0.0.0-20210111074637-7798c321f31c h1:lFEOCDq4+9ysBPjb5Rb0XpdseVxRBBvvv4g7RE6sTg8=
+github.com/tk42/redis-lua-scripts v0.0.0-20210111074637-7798c321f31c/go.mod h1:LAAXCJmjO3XtNp14G+G8ERKZF69j08MS6vPjx13LS6s=
 golang.org/x/crypto v0.0.0-20180910181607-0e37d006457b/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
