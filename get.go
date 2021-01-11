@@ -21,18 +21,8 @@ func (rs *RedigoStructs) Get(ctx context.Context, dests ...types.RediStruct) err
 		conn.Do("SELECT", dbIdx)
 	}
 
-	_, err = conn.Do("WATCH", rs.name)
-	if err != nil {
-		return errors.Wrapf(err, "failed to send WATCH %ss", rs.name)
-	}
-
-	err = conn.Send("MULTI")
-	if err != nil {
-		return errors.Wrap(err, "faild to send MULTI command")
-	}
-
 	for _, dest := range dests {
-		if reflect.ValueOf(rs.model).Elem() != reflect.ValueOf(dest).Elem() {
+		if reflect.TypeOf(rs.model) != reflect.TypeOf(dest) {
 			return errors.New("failed to compare RediStruct")
 		}
 
@@ -41,7 +31,7 @@ func (rs *RedigoStructs) Get(ctx context.Context, dests ...types.RediStruct) err
 			if len(dest.Serialized()) == 0 {
 				return errors.Errorf("failed to implement Serialized %v", dest)
 			}
-			err = rs.scripts["1_HGETALLXP"].Send(conn, rs.name, dest.PrimaryKey())
+			err = rs.scripts["HGETALLXP"].Send(conn, rs.name, dest.PrimaryKey())
 			if err != nil {
 				return errors.Wrapf(err, "failed to send HGETALLXP %s", rs.key)
 			}

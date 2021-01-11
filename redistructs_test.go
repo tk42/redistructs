@@ -71,3 +71,26 @@ func TestPut(t *testing.T) {
 		panic(fmt.Errorf("expect: %v, got: %v", 2, c))
 	}
 }
+
+func TestGet(t *testing.T) {
+	TestPut(t)
+
+	conn := redisPool.Get()
+	defer conn.Close()
+
+	postStore := New(redisPool, *types.CreateConfig(), &Post{})
+
+	p := &Post{ID: 4}
+	err := postStore.Get(context.TODO(), p)
+	if err != nil {
+		panic(err)
+	}
+
+	if p.UserID != 1 {
+		panic(fmt.Errorf("expect: %v, got: %v", 1, p.UserID))
+	}
+
+	if p.Title != "post 4" {
+		panic(fmt.Errorf("expect: %v, got: %v", "post 4", p.Title))
+	}
+}
