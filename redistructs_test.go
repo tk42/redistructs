@@ -126,3 +126,55 @@ func TestDelete(t *testing.T) {
 		panic(fmt.Errorf("expect: %v, got: %v", 2, c))
 	}
 }
+
+func TestMap(t *testing.T) {
+	TestPut(t)
+
+	postStore := New(redisPool, *types.CreateConfig(), &Post{})
+
+	m, err := postStore.Map(context.TODO())
+	if err != nil {
+		panic(err)
+	}
+
+	if len(m) != 4 {
+		panic(fmt.Errorf("expect: %v, got: %v", 4, len(m)))
+	}
+	for k, v := range m {
+		fmt.Println(k, v)
+	}
+}
+
+func TestNames(t *testing.T) {
+	TestPut(t)
+
+	postStore := New(redisPool, *types.CreateConfig(), &Post{})
+
+	m, err := postStore.Names(context.TODO())
+	if err != nil {
+		panic(err)
+	}
+
+	if len(m) != 4 {
+		panic(fmt.Errorf("expect: %v, got: %v", 4, len(m)))
+	}
+
+	fmt.Println(m)
+}
+
+func TestValues(t *testing.T) {
+	TestPut(t)
+
+	postStore := New(redisPool, *types.CreateConfig(), &Post{})
+
+	m, err := postStore.Values(context.TODO())
+	if err != nil {
+		panic(err)
+	}
+
+	if len(m) != 4 {
+		panic(fmt.Errorf("expect: %v, got: %v", 4, len(m)))
+	}
+
+	fmt.Println(m)
+}

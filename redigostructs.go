@@ -3,6 +3,7 @@ package redistructs
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"time"
 
 	redigo "github.com/gomodule/redigo/redis"
@@ -17,7 +18,6 @@ type Pool interface {
 }
 
 type RedigoStructs struct {
-	RediStructs
 	config   types.Config
 	model    types.RediStruct
 	dbIdx    int
@@ -94,21 +94,15 @@ func (rs *RedigoStructs) getDBIndex(model types.RediStruct) (int, bool) {
 	}
 }
 
-// func (rs RedigoStructs) Count(ctx context.Context, mods ...rq.Modifier) (int, error) {
-// 	return 0, nil
-// }
+func (e *RedigoStructs) clone() interface{} {
+	nInter := reflect.New(reflect.TypeOf(e.model).Elem())
 
-// func (rs RedigoStructs) Map() map[string]types.RediStruct {
-// }
+	val := reflect.ValueOf(e.model).Elem()
+	nVal := nInter.Elem()
+	for i := 0; i < val.NumField(); i++ {
+		nvField := nVal.Field(i)
+		nvField.Set(val.Field(i))
+	}
 
-// func (rs RedigoStructs) Values() []types.RediStruct {
-// }
-
-// func (rs RedigoStructs) Names() []string {
-// }
-
-// func (rs RedigoStructs) IsZero() bool {
-// }
-
-// func (rs RedigoStructs) HasZero() bool {
-// }
+	return nInter.Interface()
+}

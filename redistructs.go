@@ -15,11 +15,13 @@ type RediStructs interface {
 	// Count(ctx context.Context, mods ...rq.Modifier) (int, error)
 	// List(ctx context.Context, dest types.RediStruct, mods ...rq.Modifier) error
 
-	// Map() map[string]types.RediStruct
-	// Values() []types.RediStruct
-	// Names() []string
-	// IsZero() bool
-	// HasZero() bool
+	Map(ctx context.Context) (map[string]types.RediStruct, error)
+	Values(ctx context.Context) ([]types.RediStruct, error)
+	Names(ctx context.Context) ([]string, error)
+	// IsZero(ctx context.Context) (bool, error)
+	// HasZero(ctx context.Context) (bool, error)
+
+	clone() interface{}
 }
 
 // New creates a RediStructs instance
