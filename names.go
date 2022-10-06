@@ -22,8 +22,12 @@ func (rs *RedigoStructs) Names(ctx context.Context) ([]string, error) {
 
 	switch rs.model.StoreType() {
 	case types.Serialized:
-		if len(rs.model.Serialized()) == 0 {
-			return nil, errors.Errorf("failed to implement Serialized %v", rs.model)
+		b, err := rs.model.Marshal()
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to marshal")
+		}
+		if len(b) == 0 {
+			return nil, errors.Errorf("failed to marshal due to empty %v", rs.model)
 		}
 		err = rs.scripts["HKEYSXP"].Send(conn, rs.name)
 		if err != nil {

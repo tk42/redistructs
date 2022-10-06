@@ -51,22 +51,17 @@ func (p *Post) DatabaseIdx() int {
 	return 0
 }
 
-// Serialized implements the types.Model interface
-func (p *Post) Serialized() []byte {
+func (p *Post) Marshal() ([]byte, error) {
 	buf := bytes.NewBuffer(nil)
 	err := gob.NewEncoder(buf).Encode(&p)
 	if err != nil {
 		panic("Failed to Serialized")
 	}
-	return buf.Bytes()
+	return buf.Bytes(), err
 }
 
-// Deserialized implements the types.Model interface
-func (p *Post) Deserialized(b []byte) {
-	err := gob.NewDecoder(bytes.NewBuffer(b)).Decode(&p)
-	if err != nil {
-		panic("Failed to Deserialized. " + err.Error())
-	}
+func (p *Post) Unmarshal(b []byte) error {
+	return gob.NewDecoder(bytes.NewBuffer(b)).Decode(&p)
 }
 
 func TestMain(m *testing.M) {

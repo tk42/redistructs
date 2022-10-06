@@ -11,6 +11,6 @@ type RediStruct interface {
 	ScoreMap() map[string]interface{}
 	Expire() time.Duration
 	DatabaseIdx() int
-	Serialized() []byte
-	Deserialized([]byte)
+	Marshal() ([]byte, error)
+	Unmarshal([]byte) error
 }

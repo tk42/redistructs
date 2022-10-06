@@ -63,10 +63,14 @@ func (rs *RedigoStructs) set(conn redigo.Conn, src reflect.Value) error {
 	// 		return errors.Errorf("failed to flatten %v", err)
 	// 	}
 	case types.Serialized:
-		if len(m.Serialized()) == 0 {
-			return errors.Errorf("failed to implement Serialized %v", m)
+		b, err := m.Marshal()
+		if err != nil {
+			return errors.Wrap(err, "failed to marshal")
 		}
-		err = rs.scripts["HSETXP"].Send(conn, rs.name, rs.getExpireArg(), m.PrimaryKey(), m.Serialized())
+		if len(b) == 0 {
+			return errors.Errorf("failed to marshal due to empty %v", rs.model)
+		}
+		err = rs.scripts["HSETXP"].Send(conn, rs.name, rs.getExpireArg(), m.PrimaryKey(), b)
 		if err != nil {
 			return errors.Wrapf(err, "failed to send HSETXP %s", rs.key)
 		}

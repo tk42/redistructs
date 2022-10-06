@@ -22,8 +22,12 @@ func (rs *RedigoStructs) Values(ctx context.Context) ([]types.RediStruct, error)
 
 	switch rs.model.StoreType() {
 	case types.Serialized:
-		if len(rs.model.Serialized()) == 0 {
-			return nil, errors.Errorf("failed to implement Serialized %v", rs.model)
+		b, err := rs.model.Marshal()
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to marshal")
+		}
+		if len(b) == 0 {
+			return nil, errors.Errorf("failed to marshal due to empty %v", rs.model)
 		}
 		err = rs.scripts["HVALSXP"].Send(conn, rs.name)
 		if err != nil {
@@ -49,7 +53,9 @@ func (rs *RedigoStructs) Values(ctx context.Context) ([]types.RediStruct, error)
 	case types.Serialized:
 		for _, vv := range v {
 			s := rs.clone().(types.RediStruct)
-			s.Deserialized(vv.([]byte))
+			if err := s.Unmarshal(vv.([]byte)); err != nil {
+				return nil, errors.Wrap(err, "failed to unmarshal value")
+			}
 			result = append(result, s)
 		}
 	default:

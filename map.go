@@ -22,8 +22,12 @@ func (rs *RedigoStructs) Map(ctx context.Context) (map[string]types.RediStruct, 
 
 	switch rs.model.StoreType() {
 	case types.Serialized:
-		if len(rs.model.Serialized()) == 0 {
-			return nil, errors.Errorf("failed to implement Serialized %v", rs.model)
+		b, err := rs.model.Marshal()
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to marshal")
+		}
+		if len(b) == 0 {
+			return nil, errors.Errorf("failed to marshal due to empty %v", rs.model)
 		}
 		err = rs.scripts["HGETALLXP"].Send(conn, rs.name, rs.model.PrimaryKey())
 		if err != nil {
@@ -53,7 +57,9 @@ func (rs *RedigoStructs) Map(ctx context.Context) (map[string]types.RediStruct, 
 				key = string(vv.([]byte))
 			} else {
 				s := rs.clone().(types.RediStruct)
-				s.Deserialized(vv.([]byte))
+				if err := s.Unmarshal(vv.([]byte)); err != nil {
+					return nil, errors.Wrap(err, "failed to unmarshal")
+				}
 				result[key] = s
 			}
 		}

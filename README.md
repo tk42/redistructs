@@ -1,5 +1,5 @@
 # redistructs
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Go](https://github.com/tk42/redistructs/actions/workflows/go.yml/badge.svg)](https://github.com/tk42/redistructs/actions/workflows/go.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 Boilerplate codes to store struct as hashset or serialized object into Redis
 

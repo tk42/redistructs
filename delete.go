@@ -63,8 +63,12 @@ func (rs *RedigoStructs) delete(conn redigo.Conn, src reflect.Value) error {
 	// 		return errors.Errorf("failed to flatten %v", err)
 	// 	}
 	case types.Serialized:
-		if len(m.Serialized()) == 0 {
-			return errors.Errorf("failed to implement Serialized %v", m)
+		b, err := m.Marshal()
+		if err != nil {
+			return errors.Wrap(err, "failed to marshal")
+		}
+		if len(b) == 0 {
+			return errors.Errorf("failed to marshal due to empty %v", m)
 		}
 		err = rs.scripts["HDELXP"].Send(conn, rs.name, m.PrimaryKey())
 		if err != nil {

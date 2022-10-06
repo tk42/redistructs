@@ -28,8 +28,12 @@ func (rs *RedigoStructs) Get(ctx context.Context, dests ...types.RediStruct) err
 
 		switch dest.StoreType() {
 		case types.Serialized:
-			if len(dest.Serialized()) == 0 {
-				return errors.Errorf("failed to implement Serialized %v", dest)
+			b, err := dest.Marshal()
+			if err != nil {
+				return errors.Wrap(err, "failed to marshal")
+			}
+			if len(b) == 0 {
+				return errors.Errorf("failed to marshal due to empty %v", dest)
 			}
 			err = rs.scripts["HGETALLXP"].Send(conn, rs.name, dest.PrimaryKey())
 			if err != nil {
@@ -59,7 +63,9 @@ func (rs *RedigoStructs) Get(ctx context.Context, dests ...types.RediStruct) err
 					key = string(vv.([]byte))
 					continue
 				} else if key == dest.PrimaryKey() {
-					dest.Deserialized(vv.([]byte))
+					if err := dest.Unmarshal(vv.([]byte)); err != nil {
+						return errors.Wrap(err, "failed to unmarshal")
+					}
 					break
 				}
 			}
