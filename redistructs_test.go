@@ -12,7 +12,7 @@ import (
 
 func TestPut(t *testing.T) {
 	now := time.Now()
-	postStore := New(redisPool, *types.CreateConfig(), &Post{})
+	postStore := New(redisPool, types.CreateConfig(), &Post{})
 
 	err := postStore.Put(context.TODO(), []*Post{
 		{
@@ -75,7 +75,7 @@ func TestPut(t *testing.T) {
 func TestGet(t *testing.T) {
 	TestPut(t)
 
-	postStore := New(redisPool, *types.CreateConfig(), &Post{})
+	postStore := New(redisPool, types.CreateConfig(), &Post{})
 
 	p := &Post{ID: 4}
 	err := postStore.Get(context.TODO(), p)
@@ -95,7 +95,7 @@ func TestGet(t *testing.T) {
 func TestDelete(t *testing.T) {
 	TestPut(t)
 
-	postStore := New(redisPool, *types.CreateConfig(), &Post{})
+	postStore := New(redisPool, types.CreateConfig(), &Post{})
 
 	p := &Post{ID: 4}
 	err := postStore.Delete(context.TODO(), p)
@@ -130,7 +130,7 @@ func TestDelete(t *testing.T) {
 func TestMap(t *testing.T) {
 	TestPut(t)
 
-	postStore := New(redisPool, *types.CreateConfig(), &Post{})
+	postStore := New(redisPool, types.CreateConfig(), &Post{})
 
 	m, err := postStore.Map(context.TODO())
 	if err != nil {
@@ -148,7 +148,7 @@ func TestMap(t *testing.T) {
 func TestNames(t *testing.T) {
 	TestPut(t)
 
-	postStore := New(redisPool, *types.CreateConfig(), &Post{})
+	postStore := New(redisPool, types.CreateConfig(), &Post{})
 
 	m, err := postStore.Names(context.TODO())
 	if err != nil {
@@ -165,7 +165,7 @@ func TestNames(t *testing.T) {
 func TestValues(t *testing.T) {
 	TestPut(t)
 
-	postStore := New(redisPool, *types.CreateConfig(), &Post{})
+	postStore := New(redisPool, types.CreateConfig(), &Post{})
 
 	m, err := postStore.Values(context.TODO())
 	if err != nil {

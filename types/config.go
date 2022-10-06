@@ -31,7 +31,7 @@ func SuffixScoreSetKey(suffixScoreSetKey string) ConfigOption {
 	}
 }
 
-func CreateConfig(ops ...ConfigOption) *Config {
+func CreateConfig(ops ...ConfigOption) Config {
 	config := Config{
 		client:            Redigo,
 		DatabaseIdx:       0,
@@ -41,5 +41,5 @@ func CreateConfig(ops ...ConfigOption) *Config {
 	for _, option := range ops {
 		option(&config)
 	}
-	return &config
+	return config
 }

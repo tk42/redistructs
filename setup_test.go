@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
-	"log"
 	"os"
 	"testing"
 	"time"
@@ -18,7 +17,7 @@ var (
 )
 
 type Post struct {
-	ID        uint64 `redis:"id"`
+	ID        int64  `redis:"id"`
 	UserID    uint64 `redis:"user_id"`
 	Title     string `redis:"title"`
 	Body      string `redis:"body"`
@@ -44,7 +43,7 @@ func (p *Post) ScoreMap() map[string]interface{} {
 	}
 }
 
-func (p *Post) Expire() interface{} {
+func (p *Post) Expire() time.Duration {
 	return time.Duration(time.Second)
 }
 
@@ -78,10 +77,4 @@ func TestMain(m *testing.M) {
 	redisPool.MustClose()
 
 	os.Exit(code)
-}
-
-func teardown(t *testing.T) {
-	if err := redisPool.Cleanup(); err != nil {
-		log.Fatalf("Failed to flush redis: %s", err)
-	}
 }

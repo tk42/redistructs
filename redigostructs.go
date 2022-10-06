@@ -18,15 +18,14 @@ type Pool interface {
 }
 
 type RedigoStructs struct {
-	config   types.Config
-	model    types.RediStruct
-	dbIdx    int
-	name     string
-	key      string
-	expire   time.Duration
-	expireAt time.Time
-	pool     Pool
-	scripts  map[string]*redigo.Script
+	config  types.Config
+	model   types.RediStruct
+	dbIdx   int
+	name    string
+	key     string
+	expire  time.Duration
+	pool    Pool
+	scripts map[string]*redigo.Script
 }
 
 func NewRedigoStructs(pool Pool, config types.Config, model types.RediStruct) RediStructs {
@@ -44,23 +43,11 @@ func NewRedigoStructs(pool Pool, config types.Config, model types.RediStruct) Re
 }
 
 func (rs *RedigoStructs) setExpire(model types.RediStruct) {
-	e := model.Expire()
-	switch e.(type) {
-	case time.Time:
-		rs.expireAt = e.(time.Time)
-	case time.Duration:
-		rs.expire = e.(time.Duration)
-	default:
-		panic("Invalid model.Expire()")
-	}
+	rs.expire = model.Expire()
 }
 
 func (rs *RedigoStructs) getExpireArg() string {
-	if rs.expireAt.IsZero() {
-		return fmt.Sprint(float64(rs.expire) / float64(time.Second))
-	} else {
-		return fmt.Sprint(float64(rs.expireAt.Sub(time.Now())) / float64(time.Second))
-	}
+	return fmt.Sprint(float64(rs.expire) / float64(time.Second))
 }
 
 func loadScripts() map[string]*redigo.Script {
